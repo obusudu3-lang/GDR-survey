@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GDR survey · AI training questions · earn KSH 50</title>
+    <!-- Font Awesome 6 (professional icons, no emoji) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Paystack library -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #e2effb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-master {
+            width: 100%;
+            max-width: 1600px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 48px;
+            box-shadow: 0 30px 60px -20px #123456b3;
+            border: 1px solid rgba(255,255,255,0.7);
+            overflow: hidden;
+        }
+
+        /* --- AUTH FLIP (scenery) --- */
+        .auth-outer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            padding: 20px;
+        }
+        .flip-container {
+            width: 100%;
+            max-width: 1000px;
+            perspective: 2500px;
+        }
+        .flip-card {
+            position: relative;
+            width: 100%;
+            min-height: 620px;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 45px 40px;
+            box-shadow: 0 30px 50px -15px #0a2e4a;
+            display: flex;
+            flex-direction: column;
+        }
+        .flip-back { transform: rotateY(180deg); }
+        .auth-header {
+            display: flex; align-items: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;
+        }
+        .auth-header img {
+            width: 80px; height: 80px; border-radius: 30px; object-fit: cover;
+            box-shadow: 0 15px 20px -8px #1d4465;
+        }
+        .auth-header h2 {
+            font-size: 2.4rem; font-weight: 700;
+            background: linear-gradient(135deg, #12406b, #226a9c);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .pin-badge {
+            background: #e4effa; padding: 14px 24px; border-radius: 60px;
+            display: inline-flex; align-items: center; gap: 12px; margin-bottom: 25px;
+            width: fit-content; font-weight: 500;
+        }
+        .input-group {
+            position: relative; margin-bottom: 22px;
+        }
+        .input-group i {
+            position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+            color: #1f6da0; font-size: 1.3rem;
+        }
+        .input-group input {
+            width: 100%; padding: 20px 20px 20px 64px;
+            border: 2px solid #d4e4f5; border-radius: 70px;
+            font-size: 1rem; background: #fbfeff; transition: 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #1f6fb0; outline: none;
+            box-shadow: 0 0 0 5px rgba(31,111,176,0.1);
+        }
+        .btn-primary {
+            background: #0f405f; color: white; border: none; padding: 20px 30px;
+            width: 100%; border-radius: 70px; font-weight: 700; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            cursor: pointer; transition: 0.2s; margin-top: 10px;
+        }
+        .btn-primary:hover { background: #145e8c; }
+        .flip-trigger {
+            margin-top: 25px; text-align: center; font-weight: 500;
+            color: #1f5882; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px;
+        }
+        .auth-message {
+            margin: 20px auto 0; max-width: 800px; padding: 16px 28px;
+            border-radius: 70px; background: #e9f3fd; border-left: 6px solid #1f6fb0;
+            display: flex; align-items: center; gap: 18px;
+        }
+
+        /* --- DASHBOARD (responsive, hamburger) --- */
+        .dashboard { display: flex; min-height: 90vh; background: rgba(245, 250, 255, 0.6); }
+        .sidebar {
+            width: 280px; background: linear-gradient(170deg, #0f3a58, #13446b);
+            backdrop-filter: blur(12px); padding: 30px 16px; border-radius: 40px 0 0 40px;
+            color: white; display: flex; flex-direction: column;
+            transition: transform 0.3s ease; transform: translateX(0);
+            position: sticky; top: 0; height: 100%;
+        }
+        .sidebar.closed { transform: translateX(-100%); display: none; }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed; left: 0; top: 0; bottom: 0; z-index: 1000;
+                border-radius: 0 40px 40px 0; box-shadow: 10px 0 30px #00000030;
+                transform: translateX(0);
+            }
+            .sidebar.closed { transform: translateX(-100%); }
+        }
+        .sidebar-logo { display: flex; align-items: center; gap: 16px; margin-bottom: 45px; padding-left: 8px; }
+        .sidebar-logo img { width: 58px; height: 58px; border-radius: 22px; object-fit: cover; }
+        .sidebar-logo span { font-size: 2rem; font-weight: 700; color: white; }
+        .sidebar-menu { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .menu-item {
+            display: flex; align-items: center; gap: 18px; padding: 16px 20px;
+            border-radius: 40px; color: rgba(255,255,255,0.85); font-weight: 500;
+            transition: 0.2s; cursor: pointer;
+        }
+        .menu-item i { width: 28px; font-size: 1.4rem; }
+        .menu-item.active { background: rgba(255,255,255,0.2); color: white; box-shadow: inset 0 2px 5px #ffffff30; }
+        .menu-item:hover { background: rgba(255,255,255,0.15); }
+
+        .main-content { flex: 1; padding: 30px 24px; background: transparent; }
+        .hamburger {
+            background: white; border: none; width: 58px; height: 58px; border-radius: 50%;
+            font-size: 2rem; color: #0f405f; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; box-shadow: 0 10px 18px #afc9e0;
+            margin-bottom: 20px;
+        }
+        .top-bar { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .balance-badge {
+            background: white; padding: 16px 28px; border-radius: 60px;
+            display: flex; align-items: center; gap: 20px; box-shadow: 0 6px 18px #b6cee6;
+        }
+        .balance-badge .big-num { font-size: 2.2rem; font-weight: 700; color: #19794d; }
+        .btn-withdraw {
+            background: #1d6190; color: white; border: none; padding: 16px 32px;
+            border-radius: 60px; font-weight: 600; display: flex; align-items: center;
+            gap: 10px; cursor: pointer;
+        }
+        .activation-panel {
+            background: #fef1e0; border-radius: 40px; padding: 20px 28px;
+            margin: 20px 0; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 15px;
+            border: 1px solid #f2c89d;
+        }
+        .btn-paystack { background: #19794d; color: white; border: none; padding: 14px 30px; border-radius: 60px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .grid-questions {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px; max-height: 450px; overflow-y: auto; margin: 20px 0; padding: 5px 2px;
+        }
+        .q-card { background: white; border-radius: 32px; padding: 22px; box-shadow: 0 5px 18px #b9d0e5; }
+        .q-card.disabled { background: #ecf3fa; opacity: 0.75; }
+        .q-text { font-weight: 600; color: #103c60; margin-bottom: 16px; }
+        .options { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+        .opt-row { background: #f4faff; padding: 10px 14px; border-radius: 40px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .opt-row input { accent-color: #1f6fb0; width: 18px; height: 18px; }
+        .btn-answer { background: #219653; color: white; border: none; width: 100%; padding: 14px; border-radius: 50px; font-weight: 600; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .cooldown-note { background: #fde6cd; padding: 8px 12px; border-radius: 30px; font-size: 0.9rem; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+        .history-section { margin-top: 30px; display: none; }
+        .history-section.visible { display: block; }
+        .transact-table { background: white; border-radius: 30px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #e3effa; padding: 18px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #d1e2f2; }
+        .status-badge { background: #d0ead9; padding: 5px 16px; border-radius: 50px; display: inline-block; }
+        .footer-note { margin-top: 20px; color: #376184; text-align: center; }
+        .hidden { display: none !important; }
+        .inline-message { margin: 15px 0; padding: 16px 24px; border-radius: 60px; background: #ecf7ff; border-left: 6px solid #1f6fb0; display: flex; align-items: center; gap: 15px; }
+    </style>
+</head>
+<body>
+<div class="glass-master">
+    <!-- AUTH VIEW -->
+    <div id="authView">
+        <div class="auth-outer">
+            <div class="flip-container">
+                <div class="flip-card" id="flipCard">
+                    <!-- SIGNUP front -->
+                    <div class="flip-front">
+                        <div class="auth-header">
+                            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1960&auto=format&fit=crop" alt="forest">
+                            <h2>GDR survey</h2>
+                        </div>
+                        <div class="pin-badge"><i class="fas fa-lock"></i> 4-digit PIN · @gmail.com only</div>
+                        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" placeholder="yourname@gmail.com"></div>
+                        <div class="input-group"><i class="fas fa-key"></i><input type="password" id="signupPin" placeholder="4-digit PIN" maxlength="4" pattern="\d*" inputmode="numeric"></div>
+                        <button class="btn-primary" id="signupBtn"><i class="fas fa-user-plus"></i> Create account</button>
+                        <div class="flip-trigger" id="flipToLogin"><i class="fas fa-arrow-right-to-bracket"></i> Already have an account? Log in (PRESS DASHBOARD TO VIEW THE QUESTIONS IF UNCLEAR)</div>
+                    </div>
+                    <!-- LOGIN back -->
+                    <div class="flip-back">
+                        <div class="auth-header">
+                            <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=1950&auto=format&fit=crop" alt="mountain">
+                            <h2>Welcome back</h2>
+                        </div>
+                        <div class="pin-badge"><i class="fas fa-circle-check"></i> @gmail.com + 4-digit PIN</div>
+                        <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="yourname@gmail.com"></div>
+                        <div class="input-group"><i class="fas fa-key"></i><input type="password" id="loginPin" placeholder="4-digit PIN" maxlength="4" pattern="\d*" inputmode="numeric"></div>
+                        <button class="btn-primary" id="loginBtn"><i class="fas fa-arrow-right-to-bracket"></i> Log in</button>
+                        <div class="flip-trigger" id="flipToSignup"><i class="fas fa-user-plus"></i> New user? Sign up</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="authMessage" class="auth-message"><i class="fas fa-circle-info"></i> <span>Use your @gmail.com and 4-digit PIN</span></div>
+    </div>
+
+    <!-- DASHBOARD with hamburger sidebar -->
+    <div id="dashView" class="dashboard hidden">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://images.unsplash.com/photo-1439853949127-fa647821eba0?q=80&w=1974&auto=format&fit=crop" alt="scenery">
+                <span>GDR</span>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" id="menuDashboard"><i class="fas fa-chart-pie"></i> Dashboard</div>
+                <div class="menu-item" id="menuWithdraw"><i class="fas fa-hand-holding-dollar"></i> Withdraw</div>
+                <div class="menu-item" id="menuHistory"><i class="fas fa-clock-rotate-left"></i> History</div>
+                <div class="menu-item" id="menuChangePin"><i class="fas fa-lock"></i> Change PIN</div>
+                <div class="menu-item" id="menuLogout"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <button class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></button>
+
+            <div class="top-bar">
+                <div class="balance-badge"><i class="fas fa-wallet fa-2x" style="color:#1f7a4d;"></i><span class="big-num" id="balanceDisplay">0</span> <span>KSH</span></div>
+                <button class="btn-withdraw" id="withdrawTopBtn"><i class="fas fa-arrow-up-from-bracket"></i> Withdraw</button>
+            </div>
+
+            <!-- activation panel hidden until withdraw click -->
+            <div id="activationContainer" class="activation-panel hidden">
+                <span><i class="fas fa-circle-exclamation" style="color:#d97706;"></i> <strong>KSH 100 activation required</strong> (one-time fee)</span>
+                <button class="btn-paystack" id="paystackActBtn"><i class="fas fa-credit-card"></i> Pay KSH 100 now</button>
+            </div>
+
+            <div id="dashMessage" class="inline-message"><i class="fas fa-circle-check"></i> <span>Answer AI training questions</span></div>
+
+            <h3 style="margin: 10px 0;"><i class="fas fa-robot"></i> AI training questions (KSH 50 each)</h3>
+            <div class="grid-questions" id="questionGrid"></div>
+            <div style="margin-bottom: 8px;" id="answeredSummary"></div>
+
+            <!-- transaction history (hidden by default) -->
+            <div class="history-section" id="historySection">
+                <h3><i class="fas fa-clock-rotate-left"></i> Transaction history</h3>
+                <div class="transact-table">
+                    <table>
+                        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+                        <tbody id="transactionTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="footer-note"><i class="far fa-clock"></i> Questions refresh after 24 hours · withdrawals take up to 24h</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- REAL AI-TRAINING QUESTIONS ----------
+        const questionsAI = [
+            { text: "What is your favorite color?", options: ["Red", "Orange", "White", "Blue"] },
+            { text: "Which language is primarily used for AI development?", options: ["Python", "Java", "C++", "JavaScript"] },
+            { text: "What does 'machine learning' enable computers to do?", options: ["Learn from data", "Compute faster", "Store memory", "Display graphics"] },
+            { text: "Which of these is a type of neural network?", options: ["Convolutional", "Linear regression", "Decision tree", "K-means"] },
+            { text: "What is the name of the AI model by OpenAI that generates text?", options: ["GPT", "BERT", "DALL·E", "CLIP"] },
+            { text: "Which dataset is commonly used for image classification?", options: ["MNIST", "ImageNet", "COCO", "CIFAR-10"] },
+            { text: "What does NLP stand for?", options: ["Natural Language Processing", "Neural Learning Protocol", "Non-Linear Programming", "Network Layer Protocol"] },
+            { text: "Which algorithm is used for classification?", options: ["Logistic Regression", "K-Means", "Apriori", "PCA"] },
+            { text: "What is the output of a classification model?", options: ["Category label", "Continuous value", "Cluster", "Probability distribution"] },
+            { text: "Which library is widely used for deep learning in Python?", options: ["TensorFlow", "NumPy", "Pandas", "Matplotlib"] },
+            { text: "What is 'overfitting' in machine learning?", options: ["Model learns noise", "Model underperforms", "Model is too simple", "Model has high bias"] },
+            { text: "Which activation function is commonly used in hidden layers?", options: ["ReLU", "Sigmoid", "Tanh", "Linear"] },
+            { text: "What is the purpose of a loss function?", options: ["Measure error", "Optimize weights", "Regularize model", "Augment data"] },
+            { text: "Which technique helps prevent overfitting?", options: ["Dropout", "Boosting", "Bagging", "Ensembling"] },
+            { text: "What does a convolutional layer do?", options: ["Feature extraction", "Pooling", "Classification", "Normalization"] },
+            { text: "Which model is used for sequence prediction?", options: ["LSTM", "CNN", "GAN", "VAE"] },
+            { text: "What is the input format for an image recognition model?", options: ["Pixel array", "Text", "Audio", "CSV"] },
+            { text: "Which metric is used for classification accuracy?", options: ["F1 score", "Mean squared error", "R-squared", "Silhouette score"] },
+            { text: "What is 'deep learning' a subset of?", options: ["Machine learning", "Artificial intelligence", "Data science", "Neural networks"] },
+            { text: "Which company developed AlphaGo?", options: ["DeepMind", "OpenAI", "Google AI", "IBM"] }
+        ];
+        // generate 100 by cycling
+        const fullQuestions = [];
+        for (let i = 1; i <= 100; i++) {
+            let base = questionsAI[(i-1) % questionsAI.length];
+            fullQuestions.push({
+                id: i,
+                text: base.text + (i > questionsAI.length ? ` (variant ${Math.floor((i-1)/questionsAI.length)+1})` : ''),
+                options: [...base.options]
+            });
+        }
+
+        class Transaction { constructor(date, type, amount, status) { this.date = date; this.type = type; this.amount = amount; this.status = status; } }
+        class User { constructor(email, pin) { this.email = email; this.pin = pin; this.balance = 0; this.activated = false; this.transactions = []; this.cooldowns = {}; } }
+
+        let users = [];
+        let currentUser = null;
+
+        function loadDB() {
+            try {
+                const stored = localStorage.getItem('gdrDBv3');
+                if (stored) { users = JSON.parse(stored).map(u => Object.assign(new User('',''), u)); }
+                else { 
+                    let demo = new User('demo@gmail.com', '1234'); 
+                    demo.balance = 320; 
+                    demo.activated = true; 
+                    demo.transactions.push(new Transaction(new Date().toLocaleString(), 'activation', 100, 'completed')); 
+                    users.push(demo); 
+                }
+            } catch { users = []; }
+        }
+        function saveDB() { localStorage.setItem('gdrDBv3', JSON.stringify(users)); }
+        loadDB();
+
+        function findUser(email) { return users.find(u => u.email === email); }
+
+        // UI
+        const authView = document.getElementById('authView');
+        const dashView = document.getElementById('dashView');
+        const flipCard = document.getElementById('flipCard');
+        const authMsg = document.getElementById('authMessage');
+        const sidebar = document.getElementById('sidebar');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const historySection = document.getElementById('historySection');
+
+        document.getElementById('flipToLogin').addEventListener('click', ()=> flipCard.classList.add('flipped'));
+        document.getElementById('flipToSignup').addEventListener('click', ()=> flipCard.classList.remove('flipped'));
+
+        function setAuthMessage(msg, ok) { authMsg.innerHTML = `<i class="fas ${ok ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> <span>${msg}</span>`; authMsg.className = `auth-message ${ok ? '' : 'warning'}`; }
+        function setDashMessage(msg, ok) { document.getElementById('dashMessage').innerHTML = `<i class="fas ${ok ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> <span>${msg}</span>`; }
+
+        // signup with @gmail.com validation
+        document.getElementById('signupBtn').addEventListener('click', ()=>{
+            let email = document.getElementById('signupEmail').value.trim();
+            let pin = document.getElementById('signupPin').value.trim();
+            if (!email || !pin) return setAuthMessage('All fields required', false);
+            if (!/^\d{4}$/.test(pin)) return setAuthMessage('PIN must be 4 digits', false);
+            if (!email.endsWith('@gmail.com')) return setAuthMessage('Only @gmail.com addresses allowed', false);
+            if (findUser(email)) return setAuthMessage('Email already registered', false);
+            let user = new User(email, pin);
+            users.push(user); currentUser = user; saveDB(); showDash(); refreshDash();
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', ()=>{
+            let email = document.getElementById('loginEmail').value.trim();
+            let pin = document.getElementById('loginPin').value.trim();
+            if (!email.endsWith('@gmail.com')) return setAuthMessage('Only @gmail.com allowed', false);
+            let user = findUser(email);
+            if (!user || user.pin !== pin) return setAuthMessage('Invalid email or PIN', false);
+            currentUser = user; showDash(); refreshDash();
+        });
+
+        function showDash() { authView.classList.add('hidden'); dashView.classList.remove('hidden'); }
+        document.getElementById('menuLogout').addEventListener('click', ()=>{ currentUser = null; authView.classList.remove('hidden'); dashView.classList.add('hidden'); flipCard.classList.remove('flipped'); setAuthMessage('Logged out', true); });
+
+        hamburger.addEventListener('click', ()=> sidebar.classList.toggle('closed'));
+
+        function refreshDash() {
+            if (!currentUser) return;
+            document.getElementById('balanceDisplay').innerText = currentUser.balance;
+            renderQuestions();
+            renderTransactions();
+            document.getElementById('activationContainer').classList.add('hidden');
+            historySection.classList.remove('visible');
+        }
+
+        function renderQuestions() {
+            let grid = document.getElementById('questionGrid');
+            let now = Date.now();
+            let answered = 0;
+            let html = '';
+            fullQuestions.forEach(q => {
+                let until = currentUser.cooldowns[q.id];
+                let disabled = until && until > now;
+                if (disabled) answered++;
+                html += `<div class="q-card ${disabled?'disabled':''}"><div class="q-text"><i class="fas fa-robot"></i> ${q.text}</div><div class="options">`;
+                q.options.forEach((opt, idx) => {
+                    html += `<div class="opt-row"><input type="radio" name="q${q.id}" value="${idx}"> <span>${opt}</span></div>`;
+                });
+                html += `</div><button class="btn-answer" data-qid="${q.id}" ${disabled?'disabled':''}><i class="fas fa-paper-plane"></i> answer (50 KSH)</button>`;
+                if (disabled) html += `<div class="cooldown-note"><i class="fas fa-hourglass-half"></i> wait 24h for refresh</div>`;
+                html += `</div>`;
+            });
+            grid.innerHTML = html;
+            document.getElementById('answeredSummary').innerHTML = `<i class="fas fa-info-circle"></i> ${answered}/100 answered · reappear after 24h`;
+
+            document.querySelectorAll('.btn-answer').forEach(b => b.addEventListener('click', (e)=>{
+                let qid = parseInt(e.target.closest('button').dataset.qid); handleAnswer(qid);
+            }));
+        }
+
+        function handleAnswer(qid) {
+            if (!currentUser) return;
+            let now = Date.now();
+            if (currentUser.cooldowns[qid] && currentUser.cooldowns[qid] > now) { setDashMessage('Already answered, wait 24h', false); return; }
+            let selected = null;
+            document.getElementsByName(`q${qid}`).forEach(r => { if (r.checked) selected = r.value; });
+            if (!selected) { setDashMessage('Pick an option', false); return; }
+            currentUser.balance += 50;
+            currentUser.cooldowns[qid] = now + 86400000;
+            currentUser.transactions.push(new Transaction(new Date().toLocaleString(), 'survey', 50, 'completed'));
+            saveDB(); refreshDash(); setDashMessage('+50 KSH added', true);
+        }
+
+        function renderTransactions() {
+            let tbody = document.getElementById('transactionTable');
+            if (!currentUser.transactions.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No transactions</td></tr>'; return; }
+            let rows = '';
+            currentUser.transactions.slice().reverse().forEach(t => { rows += `<tr><td>${t.date}</td><td>${t.type}</td><td>${t.amount}</td><td><span class="status-badge">${t.status}</span></td></tr>`; });
+            tbody.innerHTML = rows;
+        }
+
+        // Withdraw: show activation if needed, else prompt amount
+        function onWithdrawClick() {
+            if (!currentUser) return;
+            if (!currentUser.activated) {
+                document.getElementById('activationContainer').classList.remove('hidden');
+                setDashMessage('Please pay KSH 100 activation fee', false);
+            } else {
+                let amount = prompt(`Your balance: ${currentUser.balance} KSH\nEnter amount to withdraw (min 50):`, '100');
+                if (!amount) return;
+                amount = parseInt(amount);
+                if (isNaN(amount) || amount < 50 || amount > currentUser.balance) {
+                    setDashMessage('Invalid amount or insufficient balance', false);
+                    return;
+                }
+                currentUser.balance -= amount;
+                currentUser.transactions.push(new Transaction(new Date().toLocaleString(), 'withdrawal', amount, 'pending'));
+                saveDB();
+                refreshDash();
+                setDashMessage(`Withdrawal of ${amount} KSH pending. This can take up to 24 hours.`, true);
+                document.getElementById('activationContainer').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('withdrawTopBtn').addEventListener('click', onWithdrawClick);
+        document.getElementById('menuWithdraw').addEventListener('click', ()=>{
+            if (window.innerWidth < 768) sidebar.classList.add('closed');
+            onWithdrawClick();
+        });
+
+        // History menu: show history section
+        document.getElementById('menuHistory').addEventListener('click', ()=>{
+            if (window.innerWidth < 768) sidebar.classList.add('closed');
+            historySection.classList.toggle('visible');
+            setDashMessage('Transaction history displayed', true);
+        });
+        document.getElementById('menuDashboard').addEventListener('click', ()=>{
+            if (window.innerWidth < 768) sidebar.classList.add('closed');
+            historySection.classList.remove('visible');
+            refreshDash();
+        });
+        document.getElementById('menuChangePin').addEventListener('click', ()=>{
+            if (window.innerWidth < 768) sidebar.classList.add('closed');
+            let np = prompt('Enter new 4-digit PIN');
+            if(np && /^\d{4}$/.test(np)) { currentUser.pin = np; saveDB(); setDashMessage('PIN changed', true); }
+        });
+
+        // Paystack activation KSH 100
+        document.getElementById('paystackActBtn')?.addEventListener('click', function() {
+            if (!currentUser) return;
+            let handler = PaystackPop.setup({
+                key: 'pk_live_513cf6cd79bf29a94a8b45142529238abed251f6', // replace with your public key
+                email: currentUser.email,
+                amount: 100 * 100,
+                currency: 'KES',
+                callback: (resp) => {
+                    currentUser.activated = true;
+                    currentUser.transactions.push(new Transaction(new Date().toLocaleString(), 'activation', 100, 'completed'));
+                    saveDB(); refreshDash(); 
+                    setDashMessage('Payment successful! You can now withdraw.', true);
+                    document.getElementById('activationContainer').classList.add('hidden');
+                },
+                onClose: ()=> setDashMessage('Payment cancelled', false)
+            });
+            handler.openIframe();
+        });
+
+        // session
+        window.onload = ()=>{
+            let last = sessionStorage.getItem('gdrEmail');
+            if (last) { let u = findUser(last); if(u) { currentUser = u; showDash(); refreshDash(); } }
+        };
+        window.onbeforeunload = ()=>{ if(currentUser) sessionStorage.setItem('gdrEmail', currentUser.email); };
+    })();
+</script>
+</body>
+</html>
